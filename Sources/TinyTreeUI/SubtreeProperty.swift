@@ -11,9 +11,8 @@ import AppKit
 #elseif canImport(UIKit)
 import UIKit
 #endif
-
 import SwiftUI
-import TreeCore
+import TinyTreeCore
 
 public struct SubtreeProperty: View {
   @ObservedObject

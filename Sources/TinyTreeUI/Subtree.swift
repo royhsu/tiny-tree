@@ -7,7 +7,7 @@
 
 import Combine
 import SwiftUI
-import TreeCore
+import TinyTreeCore
 
 /// Subtrees are primarily for generating leaves for containers, such as, List or Form to render content.
 public struct Subtree<Value, Content, Leaf>: View

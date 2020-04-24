@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-import TreeCore
+import TinyTreeCore
 
 public struct LeafProperty: View {
   @ObservedObject

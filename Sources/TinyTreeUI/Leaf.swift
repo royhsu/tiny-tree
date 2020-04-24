@@ -8,7 +8,7 @@
 
 import Combine
 import SwiftUI
-import TreeCore
+import TinyTreeCore
 
 struct Leaf<Value, Content>: View where Content: View {
   @ObservedObject
