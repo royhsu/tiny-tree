@@ -63,7 +63,15 @@ extension Primitive: Decodable {
   init(from keyedContainer: KeyedDecodingContainer<Key>) throws {
     var decoded = [Key: Primitive]()
     for key in keyedContainer.allKeys {
-      if let nestedKeyedContainer = try? keyedContainer.nestedContainer(keyedBy: Key.self, forKey: key) {
+      if let bool = try? keyedContainer.decode(Bool.self, forKey: key) {
+        decoded[key] = .bool(bool)
+      } else if let integer = try? keyedContainer.decode(Int.self, forKey: key) {
+        decoded[key] = .integer(integer)
+      } else if let double = try? keyedContainer.decode(Double.self, forKey: key) {
+        decoded[key] = .double(double)
+      } else if let string = try? keyedContainer.decode(String.self, forKey: key) {
+        decoded[key] = .string(string)
+      } else if let nestedKeyedContainer = try? keyedContainer.nestedContainer(keyedBy: Key.self, forKey: key) {
         var decodedNested = [Key: Primitive]()
         for nestedKey in nestedKeyedContainer.allKeys {
           decodedNested[nestedKey] = try nestedKeyedContainer.decode(
@@ -80,14 +88,6 @@ extension Primitive: Decodable {
           )
         }
         decoded[key] = .array(decodedNested)
-      } else if let bool = try? keyedContainer.decode(Bool.self, forKey: key) {
-        decoded[key] = .bool(bool)
-      } else if let integer = try? keyedContainer.decode(Int.self, forKey: key) {
-        decoded[key] = .integer(integer)
-      } else if let double = try? keyedContainer.decode(Double.self, forKey: key) {
-        decoded[key] = .double(double)
-      } else if let string = try? keyedContainer.decode(String.self, forKey: key) {
-        decoded[key] = .string(string)
       } else {
         throw DecodingError.typeMismatch(
           Primitive.self,
@@ -105,7 +105,15 @@ extension Primitive: Decodable {
     var unkeyedContainer = unkeyedContainer
     var decoded = [Primitive]()
     while !unkeyedContainer.isAtEnd {
-      if let nestedKeyedContainer = try? unkeyedContainer.nestedContainer(keyedBy: Key.self) {
+      if let bool = try? unkeyedContainer.decode(Bool.self) {
+        decoded.append(.bool(bool))
+      } else if let integer = try? unkeyedContainer.decode(Int.self) {
+        decoded.append(.integer(integer))
+      } else if let double = try? unkeyedContainer.decode(Double.self) {
+        decoded.append(.double(double))
+      } else if let string = try? unkeyedContainer.decode(String.self) {
+        decoded.append(.string(string))
+      } else if let nestedKeyedContainer = try? unkeyedContainer.nestedContainer(keyedBy: Key.self) {
         var decodedNested = [Key: Primitive]()
         for nestedKey in nestedKeyedContainer.allKeys {
           decodedNested[nestedKey] = try nestedKeyedContainer.decode(
@@ -122,14 +130,6 @@ extension Primitive: Decodable {
           )
         }
         decoded.append(.array(decodedNested))
-      } else if let bool = try? unkeyedContainer.decode(Bool.self) {
-        decoded.append(.bool(bool))
-      } else if let integer = try? unkeyedContainer.decode(Int.self) {
-        decoded.append(.integer(integer))
-      } else if let double = try? unkeyedContainer.decode(Double.self) {
-         decoded.append(.double(double))
-      } else if let string = try? unkeyedContainer.decode(String.self) {
-        decoded.append(.string(string))
       } else {
         throw DecodingError.typeMismatch(
           Primitive.self,
