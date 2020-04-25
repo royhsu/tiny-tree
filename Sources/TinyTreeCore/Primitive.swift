@@ -55,35 +55,110 @@ extension Primitive: ExpressibleByDictionaryLiteral {
 // MARK: - Decodable
 
 extension Primitive: Decodable {
-  public init(from decoder: Decoder) throws {
-    let container = try decoder.singleValueContainer()
-    
-    if let dictionary = try? container.decode([String: Primitive].self) {
-      self = .dictionary(
-        Dictionary(uniqueKeysWithValues: dictionary
-          .map { key, value in (Key(stringValue: key), value) })
-      )
-    } else if let dictionary = try? container.decode([Int: Primitive].self) {
-      self = .dictionary(
-        Dictionary(uniqueKeysWithValues: dictionary
-          .map { key, value in (Key(intValue: key), value) })
-      )
-    } else if let array = try? container.decode([Primitive].self) {
-      self = .array(array)
-    } else if let bool = try? container.decode(Bool.self) {
+  init(from keyedContainer: KeyedDecodingContainer<Key>) throws {
+    var decoded = [Key: Primitive]()
+    for key in keyedContainer.allKeys {
+      if let bool = try? keyedContainer.decode(Bool.self, forKey: key) {
+        decoded[key] = .bool(bool)
+      } else if let integer = try? keyedContainer.decode(Int.self, forKey: key) {
+        decoded[key] = .integer(integer)
+      } else if let string = try? keyedContainer.decode(String.self, forKey: key) {
+        decoded[key] = .string(string)
+      } else if let nestedKeyedContainer = try? keyedContainer.nestedContainer(keyedBy: Key.self, forKey: key) {
+        var decodedNested = [Key: Primitive]()
+        for nestedKey in nestedKeyedContainer.allKeys {
+          decodedNested[nestedKey] = try nestedKeyedContainer.decode(
+            Primitive.self,
+            forKey: nestedKey
+          )
+        }
+        decoded[key] = .dictionary(decodedNested)
+      } else if var nestedUnkeyedContainer = try? keyedContainer.nestedUnkeyedContainer(forKey: key) {
+        var decodedNested = [Primitive]()
+        while !nestedUnkeyedContainer.isAtEnd {
+          decodedNested.append(
+            try nestedUnkeyedContainer.decode(Primitive.self)
+          )
+        }
+        decoded[key] = .array(decodedNested)
+      } else {
+        throw DecodingError.typeMismatch(
+          Primitive.self,
+          DecodingError.Context(
+            codingPath: keyedContainer.codingPath,
+            debugDescription: "Incompatible value."
+          )
+        )
+      }
+    }
+    self = .dictionary(decoded)
+  }
+  
+  init(from unkeyedContainer: UnkeyedDecodingContainer) throws {
+    var unkeyedContainer = unkeyedContainer
+    var decoded = [Primitive]()
+    while !unkeyedContainer.isAtEnd {
+      if let bool = try? unkeyedContainer.decode(Bool.self) {
+        decoded.append(.bool(bool))
+      } else if let integer = try? unkeyedContainer.decode(Int.self) {
+        decoded.append(.integer(integer))
+      } else if let string = try? unkeyedContainer.decode(String.self) {
+        decoded.append(.string(string))
+      } else if let nestedKeyedContainer = try? unkeyedContainer.nestedContainer(keyedBy: Key.self) {
+        var decodedNested = [Key: Primitive]()
+        for nestedKey in nestedKeyedContainer.allKeys {
+          decodedNested[nestedKey] = try nestedKeyedContainer.decode(
+            Primitive.self,
+            forKey: nestedKey
+          )
+        }
+        decoded.append(.dictionary(decodedNested))
+      } else if var nestedUnkeyedContainer = try? unkeyedContainer.nestedUnkeyedContainer() {
+        var decodedNested = [Primitive]()
+        while !nestedUnkeyedContainer.isAtEnd {
+          try decodedNested.append(
+            nestedUnkeyedContainer.decode(Primitive.self)
+          )
+        }
+        decoded.append(.array(decodedNested))
+      } else {
+        throw DecodingError.typeMismatch(
+          Primitive.self,
+          DecodingError.Context(
+            codingPath: unkeyedContainer.codingPath,
+            debugDescription: "Incompatible value."
+          )
+        )
+      }
+    }
+    self = .array(decoded)
+  }
+  
+  init(from singleValueContainer: SingleValueDecodingContainer) throws {
+    if let bool = try? singleValueContainer.decode(Bool.self) {
       self = .bool(bool)
-    } else if let integer = try? container.decode(Int.self) {
+    } else if let integer = try? singleValueContainer.decode(Int.self) {
       self = .integer(integer)
-    } else if let string = try? container.decode(String.self) {
+    } else if let string = try? singleValueContainer.decode(String.self) {
       self = .string(string)
     } else {
       throw DecodingError.typeMismatch(
         Primitive.self,
         DecodingError.Context(
-          codingPath: container.codingPath,
+          codingPath: singleValueContainer.codingPath,
           debugDescription: "Incompatible value."
         )
       )
+    }
+  }
+  
+  public init(from decoder: Decoder) throws {
+    if let keyedContainer = try? decoder.container(keyedBy: Key.self) {
+      try self.init(from: keyedContainer)
+    } else if let unkeyedContainer = try? decoder.unkeyedContainer() {
+      try self.init(from: unkeyedContainer)
+    } else {
+      try self.init(from: decoder.singleValueContainer())
     }
   }
 }
