@@ -13,7 +13,6 @@ public struct LeafProperty: View {
   public var store: LeafStore<Atomic>
   @Environment(\.debugMode)
   private var debugMode
-  
   public var body: some View {
     HStack {
       indenter
@@ -72,6 +71,3 @@ extension LeafProperty {
     debugMode.wrappedValue ? AnyView(_debugCursor) : AnyView(_releaseCursor)
   }
 }
-
-//LeafProperty(LeafStore(value: "a"))
-//  .previewDisplayName("A node without parent")

@@ -48,7 +48,7 @@ extension Subtree {
     case let .leaf(store):
       return AnyView(leaf(store))
     case let .subtree(store):
-      return AnyView(Subtree(store, content: self.content, leaf: self.leaf))
+      return AnyView(Subtree(store, content: content, leaf: leaf))
     }
   }
 }
@@ -63,43 +63,24 @@ struct Subtree_Previews: PreviewProvider {
           value: .string("root"),
           children: [
             "a": ["x", "y", "z"],
-            "b": "hi",
-            "c": 3,
+            "b": 3,
+            "c": false,
           ]
         ),
-        content: { store in
+        content: { subtree in
           HStack {
-            SubtreeProperty(store)
+            SubtreeProperty(subtree)
             HStack {
-              AtomicView(value: store.value)
-              Text(store.parent == nil ? "(tree)" : "(subtree)")
+              AtomicView(value: subtree.value)
+              Text(subtree.parent == nil ? "(tree)" : "(subtree)")
                 .foregroundColor(.gray)
             }
           }
         },
-        leaf: { store in
-          HStack {
-//            SubtreeProperty(store)
-            AtomicView(value: store.value)
-          }
+        leaf: { leaf in
+          LeafProperty(leaf)
         }
       )
-    }
-  }
-}
-
-struct AtomicView: View {
-  var value: Atomic
-  var body: some View {
-    content()
-  }
-  
-  private func content() -> some View {
-    switch value {
-    case let .integer(integer):
-      return Text("\(integer)")
-    case let .string(string):
-      return Text(string)
     }
   }
 }

@@ -62,11 +62,18 @@ extension SubtreeStore.Child: Identifiable {
 
 extension SubtreeStore.Child where Value == Atomic {
   init(index: Int, primitive: Primitive) {
-    self = .init(key: Primitive.Key(intValue: index), primitive: primitive)
+    self.init(key: Primitive.Key(intValue: index), primitive: primitive)
   }
   
   init(key: Primitive.Key, primitive: Primitive) {
     switch primitive {
+    case let .bool(bool):
+      self = .subtree(
+        SubtreeStore(
+          value: Atomic(key),
+          children: [.leaf(LeafStore(value: .bool(bool)))]
+        )
+      )
     case let .integer(integer):
       self = .subtree(
         SubtreeStore(

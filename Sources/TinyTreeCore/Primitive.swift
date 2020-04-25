@@ -7,10 +7,17 @@
 
 /// Codable representation of Swift built-in primitive types.
 public enum Primitive {
+  case bool(Bool)
   case integer(Int)
   case string(String)
   indirect case array([Primitive])
   indirect case dictionary([Key: Primitive])
+}
+
+extension Primitive: ExpressibleByBooleanLiteral {
+  public init(booleanLiteral bool: Bool) {
+    self = .bool(bool)
+  }
 }
 
 // MARK: - ExpressibleByIntegerLiteral
@@ -50,9 +57,8 @@ extension Primitive: ExpressibleByDictionaryLiteral {
 extension Primitive: Decodable {
   public init(from decoder: Decoder) throws {
     let container = try decoder.singleValueContainer()
-    if let array = try? container.decode([Primitive].self) {
-      self = .array(array)
-    } else if let dictionary = try? container.decode([String: Primitive].self) {
+    
+    if let dictionary = try? container.decode([String: Primitive].self) {
       self = .dictionary(
         Dictionary(uniqueKeysWithValues: dictionary
           .map { key, value in (Key(stringValue: key), value) })
@@ -62,6 +68,10 @@ extension Primitive: Decodable {
         Dictionary(uniqueKeysWithValues: dictionary
           .map { key, value in (Key(intValue: key), value) })
       )
+    } else if let array = try? container.decode([Primitive].self) {
+      self = .array(array)
+    } else if let bool = try? container.decode(Bool.self) {
+      self = .bool(bool)
     } else if let integer = try? container.decode(Int.self) {
       self = .integer(integer)
     } else if let string = try? container.decode(String.self) {
@@ -83,6 +93,9 @@ extension Primitive: Decodable {
 extension Primitive: Encodable {
   public func encode(to encoder: Encoder) throws {
     switch self {
+    case let .bool(bool):
+      var container = encoder.singleValueContainer()
+      try container.encode(bool)
     case let .integer(integer):
       var container = encoder.singleValueContainer()
       try container.encode(integer)

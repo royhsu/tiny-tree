@@ -61,6 +61,8 @@ extension SubtreeStore where Value == Atomic {
   
   private static func parseChildren(from primitive: Primitive) -> [Child] {
     switch primitive {
+    case let .bool(bool):
+      return [.leaf(LeafStore(value: .bool(bool)))]
     case let .integer(integer):
       return [.leaf(LeafStore(value: .integer(integer)))]
     case let .string(string):

@@ -7,6 +7,7 @@
 
 /// UInt8, Int32...
 public enum Atomic {
+  case bool(Bool)
   case integer(Int)
   case string(String)
 }
