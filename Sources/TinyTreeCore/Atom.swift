@@ -5,10 +5,14 @@
 //  Created by Roy Hsu on 2020/4/11.
 //
 
+import Foundation
+
 public enum Atom {
   case bool(Bool)
   case integer(Int)
+  case double(Double)
   case string(String)
+  case date(Date)
 }
 
 // MARK: - Primitive.Key

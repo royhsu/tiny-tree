@@ -23,8 +23,12 @@ extension AtomView {
       return Text(text)
     case let .integer(integer):
       return Text("\(integer)")
+    case let .double(double):
+      return Text("\(double)")
     case let .string(string):
       return Text(string)
+    case let .date(date):
+      return Text("\(date)")
     }
   }
 }

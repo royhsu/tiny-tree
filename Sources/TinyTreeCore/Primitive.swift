@@ -5,14 +5,20 @@
 //  Created by Roy Hsu on 2020/4/7.
 //
 
-/// Codable representation of Swift built-in primitive types.
+import Foundation
+
+/// Codable representation of common primitive types.
 public enum Primitive {
   case bool(Bool)
   case integer(Int)
+  case double(Double)
   case string(String)
+  case date(Date)
   indirect case array([Primitive])
   indirect case dictionary([Key: Primitive])
 }
+
+// MARK: - ExpressibleByBooleanLiteral
 
 extension Primitive: ExpressibleByBooleanLiteral {
   public init(booleanLiteral bool: Bool) {
@@ -58,13 +64,7 @@ extension Primitive: Decodable {
   init(from keyedContainer: KeyedDecodingContainer<Key>) throws {
     var decoded = [Key: Primitive]()
     for key in keyedContainer.allKeys {
-      if let bool = try? keyedContainer.decode(Bool.self, forKey: key) {
-        decoded[key] = .bool(bool)
-      } else if let integer = try? keyedContainer.decode(Int.self, forKey: key) {
-        decoded[key] = .integer(integer)
-      } else if let string = try? keyedContainer.decode(String.self, forKey: key) {
-        decoded[key] = .string(string)
-      } else if let nestedKeyedContainer = try? keyedContainer.nestedContainer(keyedBy: Key.self, forKey: key) {
+      if let nestedKeyedContainer = try? keyedContainer.nestedContainer(keyedBy: Key.self, forKey: key) {
         var decodedNested = [Key: Primitive]()
         for nestedKey in nestedKeyedContainer.allKeys {
           decodedNested[nestedKey] = try nestedKeyedContainer.decode(
@@ -81,6 +81,16 @@ extension Primitive: Decodable {
           )
         }
         decoded[key] = .array(decodedNested)
+      } else if let date = try? keyedContainer.decode(Date.self, forKey: key) {
+        decoded[key] = .date(date)
+      } else if let bool = try? keyedContainer.decode(Bool.self, forKey: key) {
+        decoded[key] = .bool(bool)
+      } else if let integer = try? keyedContainer.decode(Int.self, forKey: key) {
+        decoded[key] = .integer(integer)
+      } else if let double = try? keyedContainer.decode(Double.self, forKey: key) {
+        decoded[key] = .double(double)
+      } else if let string = try? keyedContainer.decode(String.self, forKey: key) {
+        decoded[key] = .string(string)
       } else {
         throw DecodingError.typeMismatch(
           Primitive.self,
@@ -98,13 +108,7 @@ extension Primitive: Decodable {
     var unkeyedContainer = unkeyedContainer
     var decoded = [Primitive]()
     while !unkeyedContainer.isAtEnd {
-      if let bool = try? unkeyedContainer.decode(Bool.self) {
-        decoded.append(.bool(bool))
-      } else if let integer = try? unkeyedContainer.decode(Int.self) {
-        decoded.append(.integer(integer))
-      } else if let string = try? unkeyedContainer.decode(String.self) {
-        decoded.append(.string(string))
-      } else if let nestedKeyedContainer = try? unkeyedContainer.nestedContainer(keyedBy: Key.self) {
+      if let nestedKeyedContainer = try? unkeyedContainer.nestedContainer(keyedBy: Key.self) {
         var decodedNested = [Key: Primitive]()
         for nestedKey in nestedKeyedContainer.allKeys {
           decodedNested[nestedKey] = try nestedKeyedContainer.decode(
@@ -121,6 +125,16 @@ extension Primitive: Decodable {
           )
         }
         decoded.append(.array(decodedNested))
+      } else if let date = try? unkeyedContainer.decode(Date.self) {
+        decoded.append(.date(date))
+      } else if let bool = try? unkeyedContainer.decode(Bool.self) {
+        decoded.append(.bool(bool))
+      } else if let integer = try? unkeyedContainer.decode(Int.self) {
+        decoded.append(.integer(integer))
+      } else if let double = try? unkeyedContainer.decode(Double.self) {
+         decoded.append(.double(double))
+      } else if let string = try? unkeyedContainer.decode(String.self) {
+        decoded.append(.string(string))
       } else {
         throw DecodingError.typeMismatch(
           Primitive.self,
@@ -135,10 +149,14 @@ extension Primitive: Decodable {
   }
   
   init(from singleValueContainer: SingleValueDecodingContainer) throws {
-    if let bool = try? singleValueContainer.decode(Bool.self) {
+    if let date = try? singleValueContainer.decode(Date.self) {
+      self = .date(date)
+    } else if let bool = try? singleValueContainer.decode(Bool.self) {
       self = .bool(bool)
     } else if let integer = try? singleValueContainer.decode(Int.self) {
       self = .integer(integer)
+    } else if let double = try? singleValueContainer.decode(Double.self) {
+      self = .double(double)
     } else if let string = try? singleValueContainer.decode(String.self) {
       self = .string(string)
     } else {
@@ -174,9 +192,15 @@ extension Primitive: Encodable {
     case let .integer(integer):
       var container = encoder.singleValueContainer()
       try container.encode(integer)
+    case let .double(double):
+      var container = encoder.singleValueContainer()
+      try container.encode(double)
     case let .string(string):
       var container = encoder.singleValueContainer()
       try container.encode(string)
+    case let .date(date):
+      var container = encoder.singleValueContainer()
+      try container.encode(date)
     case let .array(array):
       var container = encoder.unkeyedContainer()
       try container.encode(array)
