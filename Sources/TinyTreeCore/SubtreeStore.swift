@@ -47,8 +47,8 @@ extension SubtreeStore {
 
 // MARK: - Primitive
 
-extension SubtreeStore where Value == Atomic {
-  public convenience init(value: Atomic, children: Primitive) {
+extension SubtreeStore where Value == Atom {
+  public convenience init(value: Atom, children: Primitive) {
     self.init(
       value: value,
       children: Self.parseChildren(from: children)

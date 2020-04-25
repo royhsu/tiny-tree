@@ -10,18 +10,18 @@ import TinyTreeCore
 
 public struct LeafProperty: View {
   @ObservedObject
-  public var store: LeafStore<Atomic>
+  public var store: LeafStore<Atom>
   @Environment(\.debugMode)
   private var debugMode
   public var body: some View {
     HStack {
       indenter
-      AtomicView(value: store.value)
+      AtomView(value: store.value)
       Spacer()
     }
   }
   
-  public init(_ store: LeafStore<Atomic>) {
+  public init(_ store: LeafStore<Atom>) {
     self.store = store
   }
 }

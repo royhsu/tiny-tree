@@ -11,7 +11,6 @@ struct Indenter<Blank, Cursor>: View where Blank: View, Cursor: View {
   var count: Int
   private let blank: () -> Blank
   private let cursor: () -> Cursor
-  
   var body: some View {
     content()
   }
@@ -27,7 +26,7 @@ struct Indenter<Blank, Cursor>: View where Blank: View, Cursor: View {
   }
 }
 
-extension Indenter{
+extension Indenter {
   private func content() -> some View {
     if count < 1 {
       return AnyView(EmptyView())

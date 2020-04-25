@@ -16,7 +16,7 @@ import TinyTreeCore
 
 public struct SubtreeProperty: View {
   @ObservedObject
-  public var store: SubtreeStore<Atomic>
+  public var store: SubtreeStore<Atom>
   @Environment(\.debugMode)
   public var debugMode
   
@@ -34,7 +34,7 @@ public struct SubtreeProperty: View {
       .frame(maxWidth: .infinity)
   }
   
-  public init(_ store: SubtreeStore<Atomic>) {
+  public init(_ store: SubtreeStore<Atom>) {
     self.store = store
   }
 }
@@ -63,12 +63,12 @@ extension SubtreeProperty {
     debugMode.wrappedValue
       ? AnyView(
         Group {
-          AtomicView(value: store.value)
+          AtomView(value: store.value)
           Text(store.parent == nil ? "(tree)" : "(subtree)")
             .foregroundColor(.gray)
         }
       )
-      : AnyView(AtomicView(value: store.value))
+      : AnyView(AtomView(value: store.value))
   }
   
   private var _debugBlank: some View {

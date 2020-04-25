@@ -1,12 +1,11 @@
 //
-//  Atomic.swift
+//  Atom.swift
 //
 //
 //  Created by Roy Hsu on 2020/4/11.
 //
 
-/// UInt8, Int32...
-public enum Atomic {
+public enum Atom {
   case bool(Bool)
   case integer(Int)
   case string(String)
@@ -14,7 +13,7 @@ public enum Atomic {
 
 // MARK: - Primitive.Key
 
-extension Atomic {
+extension Atom {
   init(_ key: Primitive.Key) {
     switch key.rawValue {
     case let .integer(integer):

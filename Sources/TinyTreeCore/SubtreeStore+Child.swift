@@ -60,7 +60,7 @@ extension SubtreeStore.Child: Identifiable {
 
 // MARK: - Primitive
 
-extension SubtreeStore.Child where Value == Atomic {
+extension SubtreeStore.Child where Value == Atom {
   init(index: Int, primitive: Primitive) {
     self.init(key: Primitive.Key(intValue: index), primitive: primitive)
   }
@@ -70,35 +70,35 @@ extension SubtreeStore.Child where Value == Atomic {
     case let .bool(bool):
       self = .subtree(
         SubtreeStore(
-          value: Atomic(key),
+          value: Atom(key),
           children: [.leaf(LeafStore(value: .bool(bool)))]
         )
       )
     case let .integer(integer):
       self = .subtree(
         SubtreeStore(
-          value: Atomic(key),
+          value: Atom(key),
           children: [.leaf(LeafStore(value: .integer(integer)))]
         )
       )
     case let .string(string):
       self = .subtree(
         SubtreeStore(
-          value: Atomic(key),
+          value: Atom(key),
           children: [.leaf(LeafStore(value: .string(string)))]
         )
       )
     case let .array(array):
       self = .subtree(
         SubtreeStore(
-          value: Atomic(key),
+          value: Atom(key),
           children: zip(array.indices, array).map(SubtreeStore.Child.init)
         )
       )
     case let .dictionary(dictionary):
       self = .subtree(
         SubtreeStore(
-          value: Atomic(key),
+          value: Atom(key),
           children: dictionary.map(SubtreeStore.Child.init)
         )
       )

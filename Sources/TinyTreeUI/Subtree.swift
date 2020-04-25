@@ -71,7 +71,7 @@ struct Subtree_Previews: PreviewProvider {
           HStack {
             SubtreeProperty(subtree)
             HStack {
-              AtomicView(value: subtree.value)
+              AtomView(value: subtree.value)
               Text(subtree.parent == nil ? "(tree)" : "(subtree)")
                 .foregroundColor(.gray)
             }
