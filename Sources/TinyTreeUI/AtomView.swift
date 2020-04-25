@@ -27,8 +27,6 @@ extension AtomView {
       return Text("\(double)")
     case let .string(string):
       return Text(string)
-    case let .date(date):
-      return Text("\(date)")
     }
   }
 }

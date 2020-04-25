@@ -13,7 +13,6 @@ public enum Primitive {
   case integer(Int)
   case double(Double)
   case string(String)
-  case date(Date)
   indirect case array([Primitive])
   indirect case dictionary([Key: Primitive])
 }
@@ -81,8 +80,6 @@ extension Primitive: Decodable {
           )
         }
         decoded[key] = .array(decodedNested)
-      } else if let date = try? keyedContainer.decode(Date.self, forKey: key) {
-        decoded[key] = .date(date)
       } else if let bool = try? keyedContainer.decode(Bool.self, forKey: key) {
         decoded[key] = .bool(bool)
       } else if let integer = try? keyedContainer.decode(Int.self, forKey: key) {
@@ -125,8 +122,6 @@ extension Primitive: Decodable {
           )
         }
         decoded.append(.array(decodedNested))
-      } else if let date = try? unkeyedContainer.decode(Date.self) {
-        decoded.append(.date(date))
       } else if let bool = try? unkeyedContainer.decode(Bool.self) {
         decoded.append(.bool(bool))
       } else if let integer = try? unkeyedContainer.decode(Int.self) {
@@ -149,9 +144,7 @@ extension Primitive: Decodable {
   }
   
   init(from singleValueContainer: SingleValueDecodingContainer) throws {
-    if let date = try? singleValueContainer.decode(Date.self) {
-      self = .date(date)
-    } else if let bool = try? singleValueContainer.decode(Bool.self) {
+    if let bool = try? singleValueContainer.decode(Bool.self) {
       self = .bool(bool)
     } else if let integer = try? singleValueContainer.decode(Int.self) {
       self = .integer(integer)
@@ -198,9 +191,6 @@ extension Primitive: Encodable {
     case let .string(string):
       var container = encoder.singleValueContainer()
       try container.encode(string)
-    case let .date(date):
-      var container = encoder.singleValueContainer()
-      try container.encode(date)
     case let .array(array):
       var container = encoder.unkeyedContainer()
       try container.encode(array)

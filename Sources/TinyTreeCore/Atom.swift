@@ -12,7 +12,6 @@ public enum Atom {
   case integer(Int)
   case double(Double)
   case string(String)
-  case date(Date)
 }
 
 // MARK: - Primitive.Key

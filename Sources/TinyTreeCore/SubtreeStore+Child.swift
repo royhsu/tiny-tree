@@ -95,13 +95,6 @@ extension SubtreeStore.Child where Value == Atom {
           children: [.leaf(LeafStore(value: .string(string)))]
         )
       )
-    case let .date(date):
-      self = .subtree(
-        SubtreeStore(
-          value: Atom(key),
-          children: [.leaf(LeafStore(value: .date(date)))]
-        )
-      )
     case let .array(array):
       self = .subtree(
         SubtreeStore(

@@ -69,8 +69,6 @@ extension SubtreeStore where Value == Atom {
       return [.leaf(LeafStore(value: .double(double)))]
     case let .string(string):
       return [.leaf(LeafStore(value: .string(string)))]
-    case let .date(date):
-      return [.leaf(LeafStore(value: .date(date)))]
     case let .array(array):
       return zip(array.indices, array).map(SubtreeStore.Child.init)
     case let .dictionary(dictionary):
